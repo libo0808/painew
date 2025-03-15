@@ -1,0 +1,72 @@
+server:
+  port: 6012 #指定运行端口
+spring:
+  # redis
+  redis:
+    host: r-wz9vj6qlyq3jzjw59bpd.redis.rds.aliyuncs.com
+    port: 6379
+    password: r-wz9vj6qlyq3jzjw59b:z@BL67Ty##$W*V53Y!
+    pool.max-active: 8
+    pool.max-wait: -1
+    pool.max-idle: 8
+    pool.min-idle: 0
+    timeout: 0
+  servlet:
+    multipart:
+      maxFileSize: 5MB
+      maxRequestSize: 10MB
+      location: /usr/temp
+
+  # 多数据源
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  datasource:
+    druid:
+      stat-view-servlet: # StatViewServlet配置
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+        url-pattern: /druid/* # 访问路径为/druid时,跳转到StatViewServlet
+        allow:  # IP白名单
+        deny:  # IP黑名单,同时存在时,deny优先于allow
+        reset-enable: true # 是否能重置数据
+      web-stat-filter: # WebStatFilter配置
+        enabled: true
+        url-pattern: /* # 添加过滤规则
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*' # 忽略过滤的格式
+    dynamic:
+      primary: master # 设置默认的数据源或者数据源组，默认值即为master
+      strict: true # 严格匹配数据源，默认false，true未匹配到指定数据源时抛异常，false使用默认数据源
+      lazy: false # 默认false非懒启动，系统加载到数据源立即初始化连接池
+      datasource:
+        master:
+          url: jdbc:mysql://rm-wz9qb9q7c920ylnl4lo.mysql.rds.aliyuncs.com:7023/musmoon_sim_server?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true
+          username: root
+          password: h$pj@N@7dnsBSL&nzC
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          type: com.alibaba.druid.pool.DruidDataSource
+          poolName: masterDataSource
+          druid:
+            initial-size: 50 #连接池配置
+            max-active: 500 #连接池配置
+            min-idle: 50 #连接池配置
+            max-wait: 60000 #连接等待超时时间
+            timeBetweenEvictionRunsMillis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+            minEvictableIdleTimeMillis: 300000  # 配置一个连接在池中最小生存的时间，单位是毫秒
+            validationQuery: SELECT 1
+            validationQueryTimeout: 3 # 检查时间
+            testWhileIdle: true
+            testOnBorrow: false
+            testOnReturn: false
+            poolPreparedStatements: true # 打开PSCache，并且指定每个连接上PSCache的大小
+            maxOpenPreparedStatements: 20
+            maxPoolPreparedStatementPerConnectionSize: 20
+            filters: stat,wall,slf4j # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+            connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000 # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+            removeAbandoned: false
+            removeAbandonedTimeoutMillis: 15000
+            logAbandoned: false
+            filter: #配置StatFilter
+              stat:
+                mergeSql: true
+                slowSqlMillis: 5000
